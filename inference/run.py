@@ -10,6 +10,7 @@ import os
 import sys
 import time
 import torch
+import torch.nn as nn
 import pandas as pd
 from datetime import datetime
 from torch.utils.data import DataLoader
@@ -23,11 +24,32 @@ sys.path.append(os.path.dirname(ROOT_DIR))
 CONF_FILE = "./settings.json"
 
 from utils import get_project_dir, configure_logging
-from training.train import IrisClassifier
 
 # Loads configuration settings from JSON
 with open(CONF_FILE, "r") as file:
     conf = json.load(file)
+
+""" When build the inference Docker image, unfortunately, I had problems to import:
+    from training.train import IrisClassifier
+   So I need to copy, paste it from the train.py 
+"""
+class IrisClassifier(nn.Module):
+    """Class of the Multiclassification Neural Network model.
+    It has 4 input features, and will predict 1 target label from 3."""
+    def __init__(self):
+        super(IrisClassifier, self).__init__()
+        self.fc1 = nn.Linear(4, 8)
+        self.fc2 = nn.Linear(8, 3)
+        self.relu = nn.ReLU()
+        self.softmax = nn.Softmax(dim=1)
+
+    def forward(self, x):
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.fc2(x)
+        x = self.softmax(x)
+        return x
+
 
 # Defines paths
 DATA_DIR = get_project_dir(conf['general']['data_dir'])

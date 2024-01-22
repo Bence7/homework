@@ -19,8 +19,8 @@ COPY training /app/training
 COPY utils.py /app
 COPY ${CONF_PATH} /app
 
-# Install any necessary packages listed in requirements.txt
-COPY requirements.txt ./
+# Install any necessary packages listed in training_requirements.txt
+COPY training_requirements.txt ./
 RUN pip install --no-cache-dir -r training_requirements.txt
 
 # Train the model
