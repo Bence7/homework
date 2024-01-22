@@ -21,7 +21,7 @@ COPY ${CONF_PATH} /app
 
 # Install any necessary packages listed in requirements.txt
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r training_requirements.txt
 
 # Train the model
 RUN python3 training/train.py
