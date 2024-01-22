@@ -12,7 +12,7 @@ WORKDIR /app
 COPY data/ /app/data
 
 # Copy models folder to Docker
-COPY models/${model_name} /app/models/${model_name}.pth
+COPY models/${model_name} /app/models/${model_name}
 
 # Copy the code itself
 COPY inference /app/inference
@@ -22,7 +22,7 @@ COPY utils.py /app
 COPY ${CONF_PATH} /app
 
 # Install any necessary packages listed in requirements.txt
-COPY requirements.txt ./
+COPY inference_requirements.txt ./
 RUN pip install --no-cache-dir -r inference_requirements.txt
 
 # Train the model
