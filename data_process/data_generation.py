@@ -42,39 +42,37 @@ INFERENCE_PATH = os.path.join(DATA_DIR, conf['inference']['inp_table_name'])
 # Singleton class for generating Iris data set
 class IrisDatasetGenerator():
     def __init__(self):
-        self.df = None
-        self.target = None
         self.train_df = None
         self.inference_df = None
 
     # Method to create the Iris data
-    def create(self, save_path: os.path, is_labeled: bool = True):
+    def create(self, df: pd.DataFrame, save_path: os.path, is_labeled: bool = True):
         if is_labeled:
-            self.save(self.train_df, save_path)
+            self.save(df, save_path)
         else:
-            self.save(self.inference_df, save_path)
+            self.save(df, save_path)
 
     def read_dataset(self) -> pd.DataFrame:
         logger.info("Creating Iris dataset...")
         iris = load_iris()
-        self.df = pd.DataFrame(data=iris.data, columns=iris.feature_names)
-        self.target = iris.target
-        self._splitting_dataset()
+        df = pd.DataFrame(data=iris.data, columns=iris.feature_names)
+        target = iris.target
+        train_df, inference_df = self.splitting_dataset(df.values, target)
+        return train_df, inference_df 
 
-    def _splitting_dataset(self):
+    def splitting_dataset(self, df_values, target) -> pd.DataFrame:
         logger.info("Splitting dataset...")
-        X = self.df.values
-        X = self.scaling(X)
-        y = self.target
-        X_train, X_test, y_train, y_test = train_test_split(
+        X = self.scaling(df_values)
+        y = target
+        X_train, X_test, y_train, _ = train_test_split(
             X, y, train_size=0.8, random_state=42)
-
-        self.train_df = pd.concat([pd.DataFrame(X_train, columns=[
+        train_df = pd.concat([pd.DataFrame(X_train, columns=[
                                   'f1', 'f2', 'f3', 'f4']), pd.DataFrame({'label': y_train})], axis=1)
-        self.inference_df = pd.DataFrame(
+        inference_df = pd.DataFrame(
             X_test, columns=['f1', 'f2', 'f3', 'f4'])
+        return train_df, inference_df
 
-    def scaling(self, df):
+    def scaling(self, df) -> pd.DataFrame:
         scaler = StandardScaler()
         return scaler.fit_transform(df)
 
@@ -89,7 +87,7 @@ if __name__ == "__main__":
     configure_logging()
     logger.info("Starting script...")
     gen = IrisDatasetGenerator()
-    gen.read_dataset()
-    gen.create(save_path=TRAIN_PATH)
-    gen.create(save_path=INFERENCE_PATH, is_labeled=False)
+    gen.train_df, gen.inference_df = gen.read_dataset()
+    gen.create(df = gen.train_df, save_path=TRAIN_PATH)
+    gen.create(df = gen.inference_df, save_path=INFERENCE_PATH, is_labeled=False)
     logger.info("Script completed successfully.")
