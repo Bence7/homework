@@ -79,7 +79,7 @@ docker run -v /path_to_your_local_model_directory:/app/models -v /path_to_your_i
 ```
 - Or you may run it with the attached terminal using the following command:
 ```bash
-docker run -it inference_image /bin/bash  
+docker run -dit inference_image /bin/bash  
 ```
 After that ensure that you have your results in the `results` directory in your inference container.
 
